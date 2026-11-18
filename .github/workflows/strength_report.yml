@@ -1,0 +1,36 @@
+name: Strength vs BTC daily report
+
+on:
+  schedule:
+    - cron: "5 0 * * *"    # 00:05 UTC = 08:05 Manila, once a day, just after the daily candle closes
+  workflow_dispatch:         # "Run workflow" button for a manual test
+
+permissions:
+  contents: write            # lets the job save data/strength_log.csv back to the repo
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Build and send report
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python strength_report.py
+
+      - name: Save journal
+        run: |
+          git config user.name "strength-bot"
+          git config user.email "strength-bot@users.noreply.github.com"
+          git add data/strength_log.csv
+          git diff --cached --quiet || git commit -m "journal: $(date -u +%F)"
+          git push
