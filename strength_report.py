@@ -26,7 +26,7 @@ import requests
 # ---------------------------------------------------------------- settings
 # "KSM" = Binance KSMUSDT. "MEXC:XEL" = MEXC XELUSDT. Add / remove coins here.
 COINS = ["ETH", "ADA", "DOT", "ALGO", "SHIB", "RSR", "LINK", "NEAR", "TIA", "SEI",
-         "OP", "COMP", "BAT", "CKB", "ID", "ANKR", "AVAX", "INJ", "KSM", "MEXC:XEL"]
+         "OP", "COMP", "BAT", "CKB", "ID", "ANKR", "AVAX", "INJ", "KSM", "MEXC:XEL","TAO","SOL","XRP","TRX"]
 
 EMA_LEN = 50
 SLOPE_N = 5
