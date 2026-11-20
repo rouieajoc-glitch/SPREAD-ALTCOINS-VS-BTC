@@ -2,15 +2,20 @@ name: Strength vs BTC daily report
 
 on:
   schedule:
-    # GitHub often starts scheduled jobs late around 00:00 UTC, so we try several times.
-    # The first attempt that runs sends the report; the others see it was sent and stop.
+    # Main trigger is cron-job.org at 08:05 Manila. These GitHub schedules are only backups
+    # (GitHub often starts them hours late); they stop at once if the report was already sent.
     - cron: "5 0 * * *"    # 08:05 Manila
     - cron: "23 0 * * *"   # 08:23 Manila
     - cron: "41 0 * * *"   # 08:41 Manila
     - cron: "13 1 * * *"   # 09:13 Manila
     - cron: "47 1 * * *"   # 09:47 Manila
     - cron: "37 2 * * *"   # 10:37 Manila (last safety net)
-  workflow_dispatch:         # "Run workflow" button: always sends
+  workflow_dispatch:         # "Run workflow" button (always sends) + cron-job.org trigger at 08:05 (force=false)
+    inputs:
+      force:
+        description: "Send even if today's report was already sent"
+        type: boolean
+        default: true
 
 permissions:
   contents: write            # lets the job save data/strength_log.csv back to the repo
@@ -36,7 +41,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FORCE: ${{ github.event_name == 'workflow_dispatch' }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
         run: python strength_report.py
 
       - name: Save journal
